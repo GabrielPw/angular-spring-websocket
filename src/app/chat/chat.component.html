@@ -1,0 +1,49 @@
+<div class="container">
+    <div class="sidebar">
+      <ul>
+        <li *ngFor="let client of connectedClientsList" (click)="openChat(client)">
+          {{ client }}
+        </li>
+      </ul>
+    </div>
+    <div class="content">
+      <div class="grid-container">
+        <div class="grid-item nameHeader">
+            <!-- Conteúdo do primeiro grid -->
+            <div class="headerContainer">
+              <img src="https://sm.ign.com/ign_br/news/z/zelda-prod/zelda-producer-on-voice-acting-and-sci-fi-elements-in-breath_6ayy.jpg" style="border-radius:100px;" height="42px" width="42px">
+              <span class="clientNameHeader">{{clientName}}</span>
+            </div>
+        </div>
+      </div>
+        
+      <div class="grid-container">
+        <div class="grid-item messages">
+          <!-- Conteúdo do segundo grid -->
+          <div>
+            <div *ngFor="let message of messages" class="message_container">
+              <div class="message">
+                <span class="clientName">{{ message.clientName }}</span> - <span class="messageContent">{{ message.content }}</span>
+              </div>
+              
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="grid-container">
+        <div class="grid-item inputs">
+          <!-- Conteúdo do terceiro grid -->
+          <div>
+            <mat-form-field appearance="fill" class="message-input">
+              <input type="text" matInput [value]="clientName" (input)="onNicknameInputChange($event)" placeholder="Nickname">
+            </mat-form-field>
+            <mat-form-field appearance="fill" class="message-input">
+              <input type="text" matInput [value]="newMessage" (input)="onMessageInputChange($event)" placeholder="Digite sua mensagem">
+            </mat-form-field>
+            <button mat-raised-button color="primary" (click)="sendMessage()" class="btn-send">Enviar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  

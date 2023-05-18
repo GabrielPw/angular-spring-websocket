@@ -1,0 +1,95 @@
+.container {
+  display: flex;
+  height: 100vh;
+}
+
+.sidebar {
+  flex: 0 0 200px;
+  background-color: #172874
+}
+
+.content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.grid-container {
+  flex: 1;
+  display: flex;
+}
+
+.grid-item {
+  display: grid;
+  flex: 1 1 auto;
+
+}
+
+.messages {
+  flex-grow: 1;
+  overflow-y: auto;
+}
+
+.message-input{
+  height: auto;
+}
+
+.mat-mdc-form-field-subscript-wrapper{
+  height: 0px;
+}
+
+.headerContainer{
+
+  display: flex;
+  margin: 10px;
+}
+
+.nameHeader{
+
+  background-color: #302f8d;
+  align-items: center;
+}
+.clientNameHeader{
+
+  padding: 10px;
+  font-size: 18px;
+  font-weight: bold;
+  color: wheat;
+}
+
+.message_container {
+  padding: 10px;
+}
+
+.message {
+  font-size: 18px;
+  background-color: white;
+  padding: 10px;
+  
+}
+
+.grid-item.inputs {
+  background-color: rgb(100, 100, 175);
+  margin-top: auto; /* Alinha o terceiro grid-item na parte inferior */
+}
+
+.grid-item.inputs{
+  margin: 0;
+  align-content: center;
+}
+
+.grid-item.inputs .btn-send {
+  margin-top: auto; /* Alinha o botão "Enviar" na parte inferior */
+}
+
+.grid-item.messages .clientName {
+  color: salmon;
+}
+
+.grid-container:first-child {
+  flex: 0 0 50px; /* Defina o valor desejado para a altura do primeiro grid-container */
+}
+
+.grid-container:last-child {
+  flex: 0 0 60px; /* Defina o valor desejado para a altura do terceiro grid-container */
+}
