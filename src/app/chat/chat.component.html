@@ -1,18 +1,25 @@
 <div class="container">
     <div class="sidebar">
+      <ul class="headerContainer" style="align-items: center;">
+        <img src="{{client.getPhotoUrl()}}" style="border-radius:100px;" height="42px" width="42px">
+        <span class="clientNameHeader client-info">{{client.getSessionId()}} </span>
+      </ul>
+      <hr>
       <ul>
-        <li *ngFor="let client of connectedClientsList" (click)="openChat(client)">
-          {{ client }}
-        </li>
+        <li style="color: wheat; text-align: center; font-size: 18px; margin: 5px; font-weight: bold;">Chat</li>
+        <li *ngFor="let clientId of sessionIdList" (click)="openChat(clientId)" class="session-item">
+          {{ clientId }}
+        </li> 
       </ul>
     </div>
     <div class="content">
       <div class="grid-container">
         <div class="grid-item nameHeader">
             <!-- Conteúdo do primeiro grid -->
-            <div class="headerContainer">
-              <img src="https://sm.ign.com/ign_br/news/z/zelda-prod/zelda-producer-on-voice-acting-and-sci-fi-elements-in-breath_6ayy.jpg" style="border-radius:100px;" height="42px" width="42px">
-              <span class="clientNameHeader">{{clientName}}</span>
+            <!-- informações referente ao chat ativo no momento -->
+            <div class="headerContainer" id="chat-ativo">
+              <img src="{{clienteChatAtivo.getPhotoUrl()}}" style="border-radius:100px;" height="42px" width="42px">
+              <span class="clientNameHeader">({{clienteChatAtivo.getSessionId()}}) </span>
             </div>
         </div>
       </div>
@@ -34,13 +41,8 @@
         <div class="grid-item inputs">
           <!-- Conteúdo do terceiro grid -->
           <div>
-            <mat-form-field appearance="fill" class="message-input">
-              <input type="text" matInput [value]="clientName" (input)="onNicknameInputChange($event)" placeholder="Nickname">
-            </mat-form-field>
-            <mat-form-field appearance="fill" class="message-input">
-              <input type="text" matInput [value]="newMessage" (input)="onMessageInputChange($event)" placeholder="Digite sua mensagem">
-            </mat-form-field>
-            <button mat-raised-button color="primary" (click)="sendMessage()" class="btn-send">Enviar</button>
+              <input class="message-input" type="text" matInput [value]="newMessage" (input)="onMessageInputChange($event)" placeholder="Digite sua mensagem">
+              <button mat-raised-button color="primary" (click)="sendMessage()" class="btn-send">Enviar</button>
           </div>
         </div>
       </div>

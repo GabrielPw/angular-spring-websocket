@@ -4,8 +4,23 @@
 }
 
 .sidebar {
-  flex: 0 0 200px;
-  background-color: #172874
+  flex: 0 0 330px;
+  background-color: #292735;
+}
+
+.sidebar ul{
+  text-decoration: none;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.session-item{
+
+  color: wheat;
+  background-color: #503b72;
+  padding: 10px;
+  margin-bottom: 20px;
 }
 
 .content {
@@ -28,10 +43,16 @@
 .messages {
   flex-grow: 1;
   overflow-y: auto;
+  background-color: #32343d;
 }
 
 .message-input{
   height: auto;
+  margin: 8px;
+  padding: 10px;
+  border-radius: 8px;
+  background-color: #a99ece;
+  width: 60%;
 }
 
 .mat-mdc-form-field-subscript-wrapper{
@@ -46,7 +67,7 @@
 
 .nameHeader{
 
-  background-color: #302f8d;
+  background-color: #292735;
   align-items: center;
 }
 .clientNameHeader{
@@ -55,6 +76,10 @@
   font-size: 18px;
   font-weight: bold;
   color: wheat;
+}
+
+.clientNameHeader.client-info{
+  font-size: 15px;
 }
 
 .message_container {
@@ -69,7 +94,7 @@
 }
 
 .grid-item.inputs {
-  background-color: rgb(100, 100, 175);
+  background-color: #292735;
   margin-top: auto; /* Alinha o terceiro grid-item na parte inferior */
 }
 
