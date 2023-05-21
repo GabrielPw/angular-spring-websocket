@@ -2,14 +2,16 @@
     <div class="sidebar">
       <ul class="headerContainer" style="align-items: center;">
         <img src="{{client.getPhotoUrl()}}" style="border-radius:100px;" height="42px" width="42px">
-        <span class="clientNameHeader client-info">{{client.getSessionId()}} </span>
+        <span class="clientNameHeader client-info">{{client.getName()}} </span>
       </ul>
       <hr>
       <ul>
+
         <li style="color: wheat; text-align: center; font-size: 18px; margin: 5px; font-weight: bold;">Chat</li>
-        <li *ngFor="let clientId of sessionIdList" (click)="openChat(clientId)" class="session-item">
+        <li *ngFor="let clientId of idList" (click)="openChat(clientId)" class="session-item">
           {{ clientId }}
         </li> 
+
       </ul>
     </div>
     <div class="content">
@@ -17,10 +19,12 @@
         <div class="grid-item nameHeader">
             <!-- Conteúdo do primeiro grid -->
             <!-- informações referente ao chat ativo no momento -->
+            <!--
             <div class="headerContainer" id="chat-ativo">
               <img src="{{clienteChatAtivo.getPhotoUrl()}}" style="border-radius:100px;" height="42px" width="42px">
               <span class="clientNameHeader">({{clienteChatAtivo.getSessionId()}}) </span>
             </div>
+            -->
         </div>
       </div>
         
@@ -28,12 +32,12 @@
         <div class="grid-item messages">
           <!-- Conteúdo do segundo grid -->
           <div>
-            <div *ngFor="let message of messages" class="message_container">
+            <!-- <div *ngFor="let message of messages" class="message_container">
               <div class="message">
                 <span class="clientName">{{ message.clientName }}</span> - <span class="messageContent">{{ message.content }}</span>
               </div>
               
-            </div>
+            </div> -->
           </div>
         </div>
       </div>
@@ -41,9 +45,9 @@
         <div class="grid-item inputs">
           <!-- Conteúdo do terceiro grid -->
           <div>
-              <input class="message-input" type="text" matInput [value]="newMessage" (input)="onMessageInputChange($event)" placeholder="Digite sua mensagem">
-              <button mat-raised-button color="primary" (click)="sendMessage()" class="btn-send">Enviar</button>
-          </div>
+            <input class="message-input" type="text" matInput [value]="newMessage" (input)="onMessageInputChange($event)" placeholder="Digite sua mensagem">
+            <button mat-raised-button color="primary" (click)="sendMessage()" class="btn-send">Enviar</button>
+          </div> 
         </div>
       </div>
     </div>

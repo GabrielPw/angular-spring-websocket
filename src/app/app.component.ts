@@ -1,3 +1,4 @@
+import { UserService } from './user.service';
 import { Component } from '@angular/core';
 
 @Component({
@@ -6,5 +7,18 @@ import { Component } from '@angular/core';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent {
-  title = 'angularChatWebSocket';
+
+  userName: string = '';
+  userNameEntered: boolean = false;
+
+
+  constructor(private userService: UserService){}
+
+  enterChat() {
+    if (this.userName.trim() !== '') {
+      this.userNameEntered = true;
+      this.userService.setUsername(this.userName);
+    }
+  }
+
 }

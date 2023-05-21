@@ -1,7 +1,9 @@
+import { UserService } from './../user.service';
 import { Client } from './Client';
 import { Message } from './Message';
 import { ChatService } from './../chat.service';
 import { Component, OnInit } from '@angular/core';
+import { MessageTypeEnum } from './MessageTypeEnum';
 
 @Component({
   selector: 'app-chat',
@@ -21,18 +23,12 @@ export class ChatComponent implements OnInit {
   -------------------
 
   1. ao iniciar o programa, as informações básicas do cliente será definida no onInit.
-
   */
-   
-  
-  clienteChatAtivo:Client = new Client('', '');
-  clientName = '';
 
   client: Client = new Client('', '');
-  newMessage: string = ''; // mensagem que o usuário digitar no campo de texto.
-  messages:Message[] = []; // Lista de mensagens que já foram recebidas.
-  sessionIdList: string[] = []; // Lista de IDs de sessão
-
+  idList: string[] = [];
+  newMessage: string = ''; // variável que vai guardar a mensagem que o cliente digitar.
+   
   // Lista com url de fotos de perfil (apenas p/ uso temporário).
   profile_pic_list: string[] = [
     'https://i.pinimg.com/236x/02/df/df/02dfdfb8f8b3c82fb1f51118fa73a914.jpg',
@@ -48,59 +44,43 @@ export class ChatComponent implements OnInit {
 
   ];
 
-  constructor(private service: ChatService) {}
-  ngOnInit(): void {
+  constructor(private service: ChatService, private userService:UserService) {}
+  async ngOnInit(): Promise<void> {
 
-    // subscribe para receber atualizações do valor da variável 'sessionId'.
-    this.service.sessionId$.subscribe((sessionId: string) => {
-      console.log("Atualizou")
-      this.client.setSessionId(sessionId);
-    });
+    // Obter informações sobre cliente
+    // Obtendo id
 
-    
-    this.service.sessionIdList$.subscribe((sessionIdList: string[]) => {
-      this.sessionIdList = sessionIdList;
+    // Aguardar a atualização do valor de idDoCliente
+    await this.service.idDoClientePromise;    
 
-      this.sessionIdList = sessionIdList.filter(id => id !== this.client.getSessionId()); // remove Id do cliente da lista de id's (só é necessário exibir o id dos outros clientes que estão online). 
-    });
+    console.log("Id do cliente vinda do service: " + this.service.idDoCliente);
+    this.client = new Client(this.userService.username, this.service.idDoCliente);
 
-    this.service.clienteAtivo$.subscribe((clienteAtivo) => {
-      this.clienteChatAtivo = clienteAtivo;
-
-      
-    });
-
+    console.log("nome do cliente: " + this.client.getName());
+    // define uma foto aletória para o cliente.
     this.client.setPhotoUrl(this.getRandomProfilePicFromList());
-    this.service.sendClientInformation(this.client);
-  }
 
-  // método para enviar mensagem.
-  sendMessage():void{
-
-    // verificar se campos não estão vazios.
-    if (this.newMessage.trim() !== ''){
-      const message = new Message(this.newMessage, this.clientName, new Date());
-      var destination = '';
-      this.service.sendMessage(message, destination);
+    // envia a foto do cliente para o servidor.
+    let payload = {
       
-      this.newMessage = '';
-    }
+      content: 'setClientPhoto',
+      urlPhoto: this.client.getPhotoUrl(),
+      sessionId: this.client.getSessionId(),
+      clientName: this.client.getName(),
+      type: 'System'
+    } 
 
-    console.log('sessionId do cliente:' + this.client.getSessionId());
-  }
+    this.service.sendMessageToServer(payload);
 
-  // Método para obter/atualizar valor 'mensagem' digitado pelo usuário.
-  onMessageInputChange(event: Event):void{
+    // obtendo lista de id's dos clientes conectados ao webSocket.
+    this.service.requestIDList();
 
-    const inputElement = event.target as HTMLInputElement;
-    this.newMessage = inputElement.value;
-  }
+    this.service.idList$.subscribe((idList: string[]) => {
 
-  // Método para obter/atualizar valor 'nome' do cliente.
-  onNicknameInputChange(event: Event):void{
-    
-    const inputElement = event.target as HTMLInputElement;
-    this.client.setName(inputElement.value);
+      // aplicando o .filter() para remover o id do cliente da lista de id's 
+      this.idList = idList.filter(id => id !== this.client.getSessionId());
+      console.log('Lista de IDs atualizada:', this.idList);
+    });
   }
 
   getRandomProfilePicFromList():string{
@@ -109,8 +89,18 @@ export class ChatComponent implements OnInit {
     return this.profile_pic_list[randomIndex];
   }
 
-  //
+  // Envia mensagem digitada pelo usuário.
+  sendMessage(){
+
+  }
+
   openChat(clientId:string){
-    this.service.getClientInformation(clientId);
+
+  }
+
+  // Atualiza a variável 'newMessage' conforme o usuário digita no campo de texto.
+  onMessageInputChange(event: Event){
+    const inputElement = event.target as HTMLInputElement;
+    this.newMessage = inputElement.value;
   }
 }

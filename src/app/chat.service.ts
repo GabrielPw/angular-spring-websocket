@@ -4,119 +4,76 @@ import { BehaviorSubject, Observable, tap } from 'rxjs';
 import { WebSocketSubject } from 'rxjs/webSocket';
 import { Message } from './chat/Message';
 import { Client } from './chat/Client';
+import { MessageTypeEnum } from './chat/MessageTypeEnum';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ChatService {
+
+  /*  
+    1. Obter id do cliente.
+    2. obter todos os clientes online.
+  */
+
   private socket$: WebSocketSubject<any>;
-  private connectedClientsSubject = new BehaviorSubject<number>(0);
-  public connectedClients$ = this.connectedClientsSubject.asObservable();
+  public idDoCliente = '';
 
-  // variáveis para armazenar o Id da sessão.
-  private sessionIdSubject = new BehaviorSubject<string>('');
-  public sessionId$ = this.sessionIdSubject.asObservable();
+  public idDoClientePromise: Promise<string>;
+  private resolveIdDoCliente!: (value: string | PromiseLike<string>) => void;
 
-  private sessionIdListSubject = new BehaviorSubject<string[]>([]);
-  public sessionIdList$ = this.sessionIdListSubject.asObservable();
+  private idListSubject: BehaviorSubject<string[]> = new BehaviorSubject<string[]>([]);
+  public idList$: Observable<string[]> = this.idListSubject.asObservable();
 
 
-  client:Client = new Client("", "");
-  private clienteAtivoSubject = new BehaviorSubject<Client>(this.client);
-  public clienteAtivo$ = this.clienteAtivoSubject.asObservable();
-  
-
+  // quando o chat service for iniciado, ele deve obter o Id do cliente e enviar o nome que o cliente inseriu no frontend.
+  // O backend vai enviar um id correspondente á sessão e o frontend vai enviar o nome do cliente.
   constructor(private http: HttpClient) {
     this.socket$ = new WebSocketSubject('ws://localhost:8080/chat');
+
+    this.idDoClientePromise = new Promise<string>((resolve) => {
+      this.resolveIdDoCliente = resolve;
+    });
+
     this.socket$.subscribe((message: any) => {
-      this.handleWebSocketMessage(message);
+
+      // as mensagens vão ser de 2 tipos: tipo 'System' ou tipo 'Chat'
+      // 'System': usado pelo frontEnd para enviar ou requisitar informações ao backend. (ex: pedir o id de um usuário/enviar o nome que o cliente inseriu.)
+      // 'Chat': mensagens trocadas pelos usuários.
+
+      // Ao receber mensagens do servidor, deve-se saber se a mensagem é do tipo 'System' ou 'Chat'
+
+      switch(message.type){
+        case MessageTypeEnum.System:
+          if(message.content == 'getId'){ // Obtem id do cliete
+            console.log('Id do cliente: ' + message.sessionId);
+            this.idDoCliente = message.sessionId;
+            this.resolveIdDoCliente(this.idDoCliente);
+          } else if (message.content === 'idList') {
+            const idList: string[] = JSON.parse(message.sessionIdList);
+            this.idListSubject.next(idList);
+            console.log('Lista de IDs: ', idList);
+            // Faça o que for necessário com a lista de IDs recebida
+          }
+          break;
+        case MessageTypeEnum.Chat:
+          break;
+      }
     });
   }
 
-  sendMessage(messageObj: Message, destination:string): void {
-    const payload = {
-      content: messageObj.content,
-      clientName: messageObj.clientName,
-      date: messageObj.actualTime,
-      sessionId: this.sessionIdSubject.getValue(),
-      destination: destination
+  sendMessageToServer(message: any) {
+    // Enviar a mensagem para o servidor usando o método `next()` do WebSocketSubject
+    this.socket$.next(message);
+  }
+
+  // Obter lista de id's.
+  requestIDList() {
+    const message = {
+      content: 'getIdList',
+      type: 'System'
     };
-    this.socket$.next(payload);
-    console.log("Mensagem enviada: " + payload.content);
+    this.sendMessageToServer(message);
   }
-
-  receiveMessage(): Observable<any> {
-    return this.socket$.asObservable().pipe(
-      tap((message: any) => {
-        this.handleWebSocketMessage(message);
-      })
-    );
-  }
-
-  // método para atualizar lista de Id's de sessão.
-  updateSessionIdList(sessionIdList: string[]):void{
-    this.sessionIdListSubject.next(sessionIdList);
-  }
-
-  private handleWebSocketMessage(message: any): void {
-    
-    console.log("Entrou no método. message: " + message.sessionId);
-    if (typeof message === 'number') {
-      this.connectedClientsSubject.next(message);
-      console.log("Número de clientes conectados: " + message);
-    } else if(Array.isArray(message)){
-
-      // JSON contendo lista de Id's.
-      //console.log("A lista de ID's chegou!");
-      this.sessionIdListSubject.next(message);
-      //console.log("Lista de IDs:", message);
-      console.log("Mesagem: " + message);
-      
-    }else{
-      console.log('sessionId chegou.');
-      console.log("Mesagem: " + message);
-
-      this.sessionIdSubject.next(message.sessionId);
-      if (message.hasOwnProperty('sessionId')) {
-        console.log("(recebido) sessionId:", message.sessionId);
-      }
   
-      if (message.hasOwnProperty('clientName')) {
-        // Atualize o BehaviorSubject correspondente
-        console.log("(recebido) clientName:", message.clientName);
-      
-      }
-  
-      if (message.hasOwnProperty('urlPhoto')) {
-        console.log("(recebido) urlPhoto:", message.urlPhoto);
-
-        this.client.setPhotoUrl(message.urlPhoto);
-        this.clienteAtivoSubject.next(this.client);
-      }
-    }
-
-  }
-
-  sendClientInformation(client:Client){
-    const payload = {  
-      destination: 'setClientInformation',
-      sessionId: this.sessionIdSubject.getValue(),
-      urlPhoto: client.getPhotoUrl()
-    };
-
-    this.socket$.next(payload);
-  }
-
-  // método para obter informações sobre um usuário (sessão) a partir de seu sessionId. será necessário quando abrir o chat.
-  getClientInformation(sessionId: string): void {
- 
-    const payload = {  
-      destination: 'getClientInformation',
-      sessionId: this.sessionIdSubject.getValue(),
-      getInfoOfSessionId: sessionId
-    };
-
-    this.socket$.next(payload);
-    console.log('requisição de informação de cliente. Dono: ' + this.sessionIdSubject.getValue() + ' - para: ' + sessionId);
-  }
 }
