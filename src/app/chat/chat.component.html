@@ -1,17 +1,19 @@
 <div class="container">
     <div class="sidebar">
       <ul class="headerContainer" style="align-items: center;">
-        <img src="{{client.getPhotoUrl()}}" style="border-radius:100px;" height="42px" width="42px">
+        <img src="{{client.getUrlPhoto()}}" style="border-radius:100px;" height="42px" width="42px">
         <span class="clientNameHeader client-info">{{client.getName()}} </span>
       </ul>
       <hr>
       <ul>
 
         <li style="color: wheat; text-align: center; font-size: 18px; margin: 5px; font-weight: bold;">Chat</li>
-        <li *ngFor="let clientId of idList" (click)="openChat(clientId)" class="session-item">
-          {{ clientId }}
-        </li> 
-
+        <ng-container *ngFor="let clientListIndex of clientList">
+          <li (click)="openChat(clientListIndex.getName(), clientListIndex.getSessionId())" class="session-item" [class.active]="clientListIndex === clienteClicado"
+            *ngIf="clientListIndex.getName() !== client.getName() && clientListIndex.getSessionId() !== client.getSessionId()">
+            {{ clientListIndex.getName() }} - {{ clientListIndex.getSessionId() }}
+          </li>
+        </ng-container>
       </ul>
     </div>
     <div class="content">
@@ -19,12 +21,14 @@
         <div class="grid-item nameHeader">
             <!-- Conteúdo do primeiro grid -->
             <!-- informações referente ao chat ativo no momento -->
-            <!--
-            <div class="headerContainer" id="chat-ativo">
-              <img src="{{clienteChatAtivo.getPhotoUrl()}}" style="border-radius:100px;" height="42px" width="42px">
-              <span class="clientNameHeader">({{clienteChatAtivo.getSessionId()}}) </span>
+            <div class="headerContainer" id="chat-ativo" *ngIf="clienteChatAtivo && clientList.includes(clienteChatAtivo)">
+              <ng-container *ngIf="clienteChatAtivo.getUrlPhoto() !== ''">
+                <img src="{{clienteChatAtivo.getUrlPhoto()}}" style="border-radius:100px;" height="42px" width="42px">
+              </ng-container>
+              <ng-container *ngIf="clienteChatAtivo.getName() !== ''">
+                <span class="clientNameHeader">{{clienteChatAtivo.getName()}} ({{clienteChatAtivo.getSessionId()}}) </span>
+              </ng-container>
             </div>
-            -->
         </div>
       </div>
         
@@ -32,12 +36,11 @@
         <div class="grid-item messages">
           <!-- Conteúdo do segundo grid -->
           <div>
-            <!-- <div *ngFor="let message of messages" class="message_container">
+            <div *ngFor="let message of chatMessages.messages" class="message_container">
               <div class="message">
-                <span class="clientName">{{ message.clientName }}</span> - <span class="messageContent">{{ message.content }}</span>
+                <span class="clientName">{{ chatMessages.senderName }}</span> - <span class="messageContent">{{ message }}</span>
               </div>
-              
-            </div> -->
+            </div> 
           </div>
         </div>
       </div>

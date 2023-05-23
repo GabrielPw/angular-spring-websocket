@@ -1,22 +1,20 @@
 export class Client{
     
-  private photoUrl:string = '';
+  constructor(private name:string, private sessionId:string, private urlPhoto:string){}
 
-    constructor(private name:string, private sessionId:string){}
-
-    getName():String{
+    getName():string{
 
         return this.name;
     }
     
-    getSessionId():String{
+    getSessionId():string{
 
         return this.sessionId;
     }
 
-    getPhotoUrl():String{
+    getUrlPhoto():string{
 
-      return this.photoUrl;
+      return this.urlPhoto;
     }
 
 
@@ -28,7 +26,12 @@ export class Client{
         this.sessionId = sessionId; 
     }
 
-    setPhotoUrl(photoUrl:string){
-      this.photoUrl = photoUrl;
+    setUrlPhoto(photoUrl:string){
+      this.urlPhoto = photoUrl;
+    }
+
+    static fromJson(json: any): Client {
+      const { name, sessionId, urlPhoto } = json;
+      return new Client(name, sessionId, urlPhoto);
     }
 }

@@ -1,9 +1,11 @@
 <!-- app.component.html -->
-<div *ngIf="!userNameEntered">
+<div *ngIf="!userNameEntered" class="mainContainer">
     <h1>Bem-vindo ao Chat</h1>
     <p>Por favor, digite seu nome:</p>
-    <input type="text" [(ngModel)]="userName">
-    <button (click)="enterChat()">Entrar</button>
-  </div>
+    <div>
+      <input type="text" class="nameInput" [(ngModel)]="userName">
+      <button (click)="enterChat()" class="btnEntrar">Entrar</button>
+    </div> 
+</div>
   
   <app-chat *ngIf="userNameEntered"></app-chat>
